@@ -141,7 +141,8 @@ def balanced_training_set(df_test, df_train, df_validation):
     # print(x_train_miss.rank)
     # print("the rank of y is: ")
     # print(y_train_miss.rank)
-    return x_train_miss, y_train_miss
+    x_train_miss["Vote"] = y_train_miss
+    return x_train_miss
 
 
 def main():
@@ -193,15 +194,12 @@ def main():
     df_train, df_test, df_validation = apply_feature_selection(df_train, df_test, df_validation, feature_set)
 
     # balanced training set
-    x_train_miss, y_train_miss = balanced_training_set(df_test, df_train, df_validation)
+    df_train = balanced_training_set(df_test, df_train, df_validation)
 
     # step number 3
     # Save the 3x2 data sets in CSV files
     # CSV files of the prepared train, validation and test data sets
     save_files(df_train, df_test, df_validation)
-
-
-
 
 
 if __name__ == '__main__':
