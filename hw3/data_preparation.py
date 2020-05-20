@@ -1,9 +1,7 @@
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
 from imblearn.under_sampling import NearMiss
 from collections import Counter
-
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from hw3.features import *
 
@@ -132,6 +130,20 @@ def remove_outliers(threshold: float, df_train: pd.DataFrame, df_validation: pd.
     return df_train, df_validation, df_test
 
 
+def balanced_training_set(df_test, df_train, df_validation):
+    nr = NearMiss()
+    x_train = df_train.drop("Vote", 1)
+    y_train = df_train["Vote"]
+    x_train_miss, y_train_miss = nr.fit_sample(x_train, y_train)
+    # counter = Counter(y_train_miss)
+    # print(counter)
+    # print("the rank of x is: ")
+    # print(x_train_miss.rank)
+    # print("the rank of y is: ")
+    # print(y_train_miss.rank)
+    return x_train_miss, y_train_miss
+
+
 def main():
     # first part - data preparation
     # step number 1
@@ -180,28 +192,16 @@ def main():
     feature_set = right_feature_set
     df_train, df_test, df_validation = apply_feature_selection(df_train, df_test, df_validation, feature_set)
 
-    print(df_train)
-    print(df_test)
-    print(df_validation)
-    print(df_train["Vote"])
-    counter = Counter(df_train["Vote"])
-    print(counter)
-
-    nr = NearMiss()
-    x_train = df_train.drop("Vote", 1)
-    y_train = df_train["Vote"]
-    
-
-
-    # x_train_miss, y_train_miss = nr.fit_sample(x_train, y_train)
-    # print(x_train_miss)
-    # print("#############################################")
-    # print(y_train_miss)
+    # balanced training set
+    x_train_miss, y_train_miss = balanced_training_set(df_test, df_train, df_validation)
 
     # step number 3
     # Save the 3x2 data sets in CSV files
     # CSV files of the prepared train, validation and test data sets
-    # save_files(df_train, df_test, df_validation)
+    save_files(df_train, df_test, df_validation)
+
+
+
 
 
 if __name__ == '__main__':
