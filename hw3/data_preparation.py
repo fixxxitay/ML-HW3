@@ -1,12 +1,13 @@
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
 from imblearn.under_sampling import NearMiss
-
+from collections import Counter
 
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from hw3.features import *
 
-right_feature_set = ["Yearly_IncomeK", "Number_of_differnt_parties_voted_for", "Political_interest_Total_Score",
+right_feature_set = ["Vote", "Yearly_IncomeK", "Number_of_differnt_parties_voted_for", "Political_interest_Total_Score",
                      "Avg_Satisfaction_with_previous_vote", "Avg_monthly_income_all_years",
                      "Most_Important_Issue", "Overall_happiness_score", "Avg_size_per_room",
                      "Weighted_education_rank"]
@@ -22,10 +23,11 @@ def deterministic_split(df, train, test):
 
 def balanced_split(df, train):
     nr = NearMiss()
-    X_train_miss, y_train_miss = nr.fit_sample(train[:, 1:], train[:, 1])
+    x_train = train[:, 1:]
+    y_train = train[:, 1]
+    x_train_miss, y_train_miss = nr.fit_sample(x_train, y_train)
 
-    return X_train_miss, y_train_miss
-
+    return x_train_miss, y_train_miss
 
 
 def save_files(df_train, df_test, df_validation):
@@ -93,11 +95,9 @@ def nominal_to_numerical_categories(df: pd.DataFrame):
 
 
 def apply_feature_selection(df_train, df_test, df_validation, feature_set):
-    array_bool = np.array([True], dtype=bool)
-    array_bool = np.append(array_bool, feature_set)
-    df_train = df_train.iloc[:, array_bool == True]
-    df_test = df_test.iloc[:, array_bool == True]
-    df_validation = df_validation.iloc[:, array_bool == True]
+    df_train = df_train[feature_set]
+    df_test = df_test[feature_set]
+    df_validation = df_validation[feature_set]
 
     return df_train, df_test, df_validation
 
@@ -180,10 +180,28 @@ def main():
     feature_set = right_feature_set
     df_train, df_test, df_validation = apply_feature_selection(df_train, df_test, df_validation, feature_set)
 
+    print(df_train)
+    print(df_test)
+    print(df_validation)
+    print(df_train["Vote"])
+    counter = Counter(df_train["Vote"])
+    print(counter)
+
+    nr = NearMiss()
+    x_train = df_train.drop("Vote", 1)
+    y_train = df_train["Vote"]
+    
+
+
+    # x_train_miss, y_train_miss = nr.fit_sample(x_train, y_train)
+    # print(x_train_miss)
+    # print("#############################################")
+    # print(y_train_miss)
+
     # step number 3
     # Save the 3x2 data sets in CSV files
     # CSV files of the prepared train, validation and test data sets
-    save_files(df_train, df_test, df_validation)
+    # save_files(df_train, df_test, df_validation)
 
 
 if __name__ == '__main__':
