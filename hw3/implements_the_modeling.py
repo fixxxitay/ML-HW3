@@ -18,12 +18,16 @@ from_label_to_num = {'Blues': 0, 'Browns': 1, 'Greens': 2, 'Greys': 3, 'Khakis':
                      'Oranges': 5, 'Pinks': 6, 'Purples': 7, 'Reds': 8,
                      'Turquoises': 9, 'Violets': 10, 'Whites': 11, 'Yellows': 12}
 
+labels = ['Blues', 'Browns', 'Greens', 'Greys', 'Khakis',
+          'Oranges', 'Pinks', 'Purples', 'Reds',
+          'Turquoises', 'Violets', 'Whites', 'Yellows']
+
 
 def winner_party(clf, x_test):
     y_test_pred_probability = np.mean(clf.predict_proba(x_test), axis=0)
     winner_pred = np.argmax(y_test_pred_probability)
     print("The predicted party to win the elections is: " + from_num_to_label[winner_pred])
-    plt.plot(y_test_pred_probability)
+    plt.plot(y_test_pred_probability, "red")
     plt.title("Test predicted vote probabilities")
     plt.show()
 
@@ -39,35 +43,31 @@ def print_cross_val_accuracy(sgd_clf, x_train, y_train):
 
 
 def vote_division(y_pred_test, y_train):
-    pred_histogram = {}
+    pred_values = []
     for i, label in from_num_to_label.items():
         result_true = len(y_pred_test[y_pred_test == i])
         all_results = len(y_pred_test)
-        ratio = result_true / all_results
-        ratio_str = str(ratio * 100)
-        pred_histogram[label] = ratio_str + '%'
-    print("Pred histogram")
-    print(pred_histogram)
+        ratio = (result_true / all_results) * 100
+        pred_values.append(ratio)
 
-    real_histogram = {}
+    plt.figure(figsize=(5, 5))
+    colors = ["blue", "brown", "green", "grey", "khaki", "orange",
+              "pink", "purple", "red", "turquoise", "violet", "white", "yellow"]
+    explode = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0.2, 0, 0, 0]
+    plt.pie(pred_values, labels=labels, autopct="%.1f%%", explode=explode, colors=colors)
+    plt.title("Test prediction vote division cart")
+    plt.show()
+
+    real_values = []
     for i, label in from_num_to_label.items():
         num_res = len(y_train[y_train == i])
         all_results = len(y_train)
-        ratio = num_res / all_results
-        ratio_str = str(ratio * 100)
-        real_histogram[label] = ratio_str + '%'
-    print("Real histogram")
-    print(real_histogram)
+        ratio = (num_res / all_results) * 100
+        real_values.append(ratio)
 
-    plt.hist(y_pred_test, density=True)
-    plt.title("Test predication vote division histogram")
-    plt.xlabel("The index of party")
-    plt.ylabel("Ratio of votes")
-    plt.show()
-    plt.hist(y_train, density=True)
-    plt.title("Real vote division histogram")
-    plt.xlabel("The index of party")
-    plt.ylabel("Ratio of votes")
+    plt.figure(figsize=(5, 5))
+    plt.pie(real_values, labels=labels, autopct="%.1f%%", explode=explode, colors=colors)
+    plt.title("Real vote division cart")
     plt.show()
 
 
@@ -86,18 +86,61 @@ def train_some_models(x_train, y_train):
     knn_clf = KNeighborsClassifier(n_neighbors=3)
     print_cross_val_accuracy(knn_clf, x_train, y_train)
 
-    print("DecisionTreeClassifier")
+    print("DecisionTreeClassifier, min_samples_split=5 min_samples_leaf=3")
     dt_clf = DecisionTreeClassifier(random_state=0, criterion='entropy', min_samples_split=5,
                                     min_samples_leaf=3)
     print_cross_val_accuracy(dt_clf, x_train, y_train)
 
-    print("DecisionTreeClassifier2")
+    print("DecisionTreeClassifier, min_samples_split=5 min_samples_leaf=1")
+    dt_clf = DecisionTreeClassifier(random_state=0, criterion='entropy', min_samples_split=5,
+                                    min_samples_leaf=1)
+    print_cross_val_accuracy(dt_clf, x_train, y_train)
+
+    print("DecisionTreeClassifier2 - entropy, min_samples_split=3 min_samples_leaf=1")
     dt_clf = DecisionTreeClassifier(random_state=0, criterion='entropy', min_samples_split=3,
                                     min_samples_leaf=1)
     print_cross_val_accuracy(dt_clf, x_train, y_train)
 
-    print("RandomForestClassifier")
+    print("DecisionTreeClassifier2 - entropy, min_samples_split=5 min_samples_leaf=1")
+    dt_clf = DecisionTreeClassifier(random_state=0, criterion='entropy', min_samples_split=5,
+                                    min_samples_leaf=1)
+    print_cross_val_accuracy(dt_clf, x_train, y_train)
+
+    print("DecisionTreeClassifier - gini")
+    dt_clf = DecisionTreeClassifier(random_state=0, criterion='gini', min_samples_split=3,
+                                    min_samples_leaf=1)
+    print_cross_val_accuracy(dt_clf, x_train, y_train)
+
+    print("RandomForestClassifier - regular")
     rf_clf = RandomForestClassifier(n_jobs=-1, random_state=0)
+    print_cross_val_accuracy(rf_clf, x_train, y_train)
+
+    print("RandomForestClassifier - gini")
+    rf_clf = RandomForestClassifier(n_jobs=-1, random_state=0, criterion='gini')
+    print_cross_val_accuracy(rf_clf, x_train, y_train)
+
+    print("RandomForestClassifier - entropy")
+    rf_clf = RandomForestClassifier(n_jobs=-1, random_state=0, criterion='entropy')
+    print_cross_val_accuracy(rf_clf, x_train, y_train)
+
+    print("RandomForestClassifier - entropy, min_samples_split=3 min_samples_leaf=1")
+    rf_clf = RandomForestClassifier(n_jobs=-1, random_state=0, criterion='entropy', min_samples_split=3,
+                                    min_samples_leaf=1)
+    print_cross_val_accuracy(rf_clf, x_train, y_train)
+
+    print("RandomForestClassifier - entropy, min_samples_split=5 min_samples_leaf=1")
+    rf_clf = RandomForestClassifier(n_jobs=-1, random_state=0, criterion='entropy', min_samples_split=5,
+                                    min_samples_leaf=1)
+    print_cross_val_accuracy(rf_clf, x_train, y_train)
+
+    print("RandomForestClassifier - entropy, min_samples_split=5 min_samples_leaf=1")
+    rf_clf = RandomForestClassifier(n_jobs=-1, random_state=0, criterion='entropy', min_samples_split=5,
+                                    min_samples_leaf=1)
+    print_cross_val_accuracy(rf_clf, x_train, y_train)
+
+    print("RandomForestClassifier - entropy, min_samples_split=5 min_samples_leaf=3")
+    rf_clf = RandomForestClassifier(n_jobs=-1, random_state=0, criterion='entropy', min_samples_split=5,
+                                    min_samples_leaf=3)
     print_cross_val_accuracy(rf_clf, x_train, y_train)
 
 
@@ -150,7 +193,7 @@ def main():
     # we make the random state constant for reproducible results
     # train (fit) using cross validation
 
-    # train_some_models(x_train, y_train)
+    train_some_models(x_train, y_train)
 
     # step number 6
     # Load the prepared validation set
@@ -169,8 +212,9 @@ def main():
 
     # the winner! RandomForestClassifier
     print("RandomForestClassifier on the validation set ")
-    rf_clf = RandomForestClassifier(n_jobs=-1, random_state=0)
-    # print_cross_val_accuracy(rf_clf, x_validation, y_validation)
+    rf_clf = RandomForestClassifier(n_jobs=-1, random_state=0, criterion='entropy', min_samples_split=3,
+                                    min_samples_leaf=1)
+    print_cross_val_accuracy(rf_clf, x_validation, y_validation)
 
     # step number 8
     # Select the best model for the prediction tasks
@@ -185,13 +229,14 @@ def main():
     x_test = df_prepared_test.drop("Vote", 1)
     y_test = df_prepared_test["Vote"]
 
-    best_model_clf = RandomForestClassifier(n_jobs=-1, random_state=0)
+    best_model_clf = RandomForestClassifier(n_jobs=-1, random_state=0, criterion='entropy', min_samples_split=3,
+                                            min_samples_leaf=1)
 
     x_train_and_validation = x_train.append(x_validation).reset_index(drop=True)
     y_train_and_validation = y_train.append(y_validation).reset_index(drop=True)
 
-    # print("the best score from random forest on train + validation is:")
-    # print_cross_val_accuracy(best_model_clf, x_train_and_validation, y_train_and_validation)
+    print("the best score from random forest on train + validation is:")
+    print_cross_val_accuracy(best_model_clf, x_train_and_validation, y_train_and_validation)
 
     best_model_clf.fit(x_train_and_validation, y_train_and_validation)
     y_test_pred = best_model_clf.predict(x_test)
