@@ -27,8 +27,7 @@ def mod_vote(clf, x_test, feature, toAdd):
 
 def main():
     # Third part - Non-Mandatory Assignments
-    # step number 14
-    # Handle the fourth predication task
+    # fourth predication task
 
     x_train, y_train = get_x_and_y("prepared_train.csv")
     x_validation, y_validation = get_x_and_y("prepared_validation.csv")

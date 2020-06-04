@@ -24,7 +24,7 @@ def Widrow_Hoff(x_train: pd.DataFrame, y_train: pd.DataFrame, nbIterations: int,
 
 
 def main():
-
+    return 0
 
 if __name__ == '__main__':
     main()

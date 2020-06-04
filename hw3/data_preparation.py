@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-from collections import Counter
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
 from features import *
 from sklearn.model_selection import StratifiedShuffleSplit
@@ -125,26 +124,7 @@ def remove_outliers(threshold: float, df_train: pd.DataFrame, df_validation: pd.
 
 def main():
     # first part - data preparation
-    # step number 1
-    # Load the Election Challenge data from the ElectionsData.csv file
-    """
-    1. Can be found at the “The Election Challenge” section in the course site
-    2. Make sure that you’ve identified the correct type of each attribute
-    """
     df = pd.read_csv("ElectionsData.csv")
-
-
-    # step number 2
-    # Select the right set of features (as listed in the end of this document),
-    # and apply the data preparation tasks that you’ve carried out in the former
-    # exercise, on the train, validation, and test data sets
-    """
-    1. At the very least, handle fill up missing values
-        All other actions, such as outlier detection and normalization,
-        are not mandatory. Still, you are encouraged to do them,
-        as they should provide you added values for the modeling part
-    2. Whether to use the validation set for pre-processing steps is your call
-    """
 
     # split the data to train , test and validation
     df_train, df_test, df_validation = deterministic_split(df, 0.6, 0.2)
