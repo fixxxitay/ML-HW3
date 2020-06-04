@@ -15,10 +15,6 @@ from_num_to_label = {0: 'Blues', 1: 'Browns', 2: 'Greens', 3: 'Greys', 4: 'Khaki
                      5: 'Oranges', 6: 'Pinks', 7: 'Purples', 8: 'Reds',
                      9: 'Turquoises', 10: 'Violets', 11: 'Whites', 12: 'Yellows'}
 
-from_label_to_num = {'Blues': 0, 'Browns': 1, 'Greens': 2, 'Greys': 3, 'Khakis': 4,
-                     'Oranges': 5, 'Pinks': 6, 'Purples': 7, 'Reds': 8,
-                     'Turquoises': 9, 'Violets': 10, 'Whites': 11, 'Yellows': 12}
-
 labels = ['Blues', 'Browns', 'Greens', 'Greys', 'Khakis',
           'Oranges', 'Pinks', 'Purples', 'Reds',
           'Turquoises', 'Violets', 'Whites', 'Yellows']
@@ -27,7 +23,7 @@ labels = ['Blues', 'Browns', 'Greens', 'Greys', 'Khakis',
 def winner_party(clf, x_test):
     y_test_pred_probability = np.mean(clf.predict_proba(x_test), axis=0)
     winner_pred = np.argmax(y_test_pred_probability)
-    print("The predicted party to win the elections is: " + from_num_to_label[winner_pred])
+    print("The predicted winner of the elections is: " + from_num_to_label[winner_pred])
     plt.plot(y_test_pred_probability, "red")
     plt.title("Test predicted vote probabilities")
     plt.show()
