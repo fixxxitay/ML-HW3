@@ -1,9 +1,8 @@
 import pandas as pd
 import numpy as np
-from imblearn.under_sampling import NearMiss
 from collections import Counter
 from sklearn.preprocessing import StandardScaler, MinMaxScaler
-from hw3.features import *
+from features import *
 from sklearn.model_selection import StratifiedShuffleSplit
 
 right_feature_set = ["Vote", "Yearly_IncomeK", "Number_of_differnt_parties_voted_for", "Political_interest_Total_Score",
@@ -19,33 +18,15 @@ def deterministic_split(df, train, test):
 
     return df_train, df_test, df_validation
 
-
-def balanced_split(df, train):
-    nr = NearMiss()
-    x_train = train[:, 1:]
-    y_train = train[:, 1]
-    x_train_miss, y_train_miss = nr.fit_sample(x_train, y_train)
-
-    return x_train_miss, y_train_miss
-
-
 def save_files(df_train, df_test, df_validation):
     df_train.to_csv('prepared_train.csv', index=False)
     df_validation.to_csv('prepared_validation.csv', index=False)
     df_test.to_csv('prepared_test.csv', index=False)
 
 
-def remove_wrong_party_and_na(df_train, df_test, df_validation):
-    # df_train = df_train[df_train.Vote != 10]
-    # df_train = df_train[df_train.Vote != 4]
+def remove_na(df_train, df_test, df_validation):
     df_train = df_train.dropna()
-
-    # df_test = df_test[df_test.Vote != 10]
-    # df_test = df_test[df_test.Vote != 4]
     df_test = df_test.dropna()
-
-    # df_validation = df_validation[df_validation.Vote != 10]
-    # df_validation = df_validation[df_validation.Vote != 4]
     df_validation = df_validation.dropna()
 
     return df_train, df_test, df_validation
@@ -142,22 +123,6 @@ def remove_outliers(threshold: float, df_train: pd.DataFrame, df_validation: pd.
     return df_train, df_validation, df_test
 
 
-def balanced_training_set(df_test, df_train, df_validation):
-    nr = NearMiss()
-    x_train = df_train.drop("Vote", 1)
-    y_train = df_train["Vote"]
-    x_train_miss, y_train_miss = nr.fit_sample(x_train, y_train)
-
-    # print("the rank of y is: ")
-    # print(y_train_miss.rank)
-    x_train_miss["Vote"] = y_train_miss
-    counter = Counter(x_train_miss["Vote"])
-    print("the rank of x is: ")
-    print(x_train_miss.rank)
-    print(counter)
-    return x_train_miss
-
-
 def main():
     # first part - data preparation
     # step number 1
@@ -188,8 +153,7 @@ def main():
     save_raw_data(df_test, df_train, df_validation)
 
     # apply feature selection
-    feature_set = right_feature_set
-    df_train, df_test, df_validation = apply_feature_selection(df_train, df_test, df_validation, feature_set)
+    df_train, df_test, df_validation = apply_feature_selection(df_train, df_test, df_validation, right_feature_set)
 
     # Convert nominal types to numerical categories
     df_test, df_train, df_validation = nominal_to_numerical_categories(df_test, df_train, df_validation)
@@ -203,19 +167,15 @@ def main():
     threshold = 3  # .3
     df_train, df_validation, df_test = remove_outliers(threshold, df_train, df_validation, df_test)
 
-    # Remove lines with wrong party (Violets | Khakis)
-    df_train, df_test, df_validation = remove_wrong_party_and_na(df_train, df_test, df_validation)
+    # Remove lines containing na values
+    df_train, df_test, df_validation = remove_na(df_train, df_test, df_validation)
 
     # 3 - Normalization (scaling)
-    df_train, df_test, df_validation = normalize(df_test, df_train, df_validation)
-
-    # balanced training set
-    # df_train = balanced_training_set(df_test, df_train, df_validation)
+    df_train, df_test, df_validation = normalize(df_test, df_train, df_validation)    
 
     # step number 3
     # Save the 3x2 data sets in CSV files
     # CSV files of the prepared train, validation and test data sets
-
     save_files(df_train, df_test, df_validation)
 
 
